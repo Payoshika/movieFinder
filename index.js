@@ -6,14 +6,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var MovieDisplay = function MovieDisplay(props) {
-  return React.createElement(
-    React.Fragment,
-    null,
-    props.contents
-  );
-};
-
 var Input = function (_React$Component) {
   _inherits(Input, _React$Component);
 
@@ -174,7 +166,11 @@ var App = function (_React$Component3) {
             React.createElement(
               "div",
               { className: "search-result-container rounded-circle d-flex justify-content-center align-items-center flex-wrap" },
-              React.createElement(MovieDisplay, { contents: contents })
+              React.createElement(
+                React.Fragment,
+                null,
+                contents
+              )
             )
           )
         )

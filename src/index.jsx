@@ -1,9 +1,3 @@
-const MovieDisplay = (props) => {
-  return (
-    <React.Fragment>{props.contents}</React.Fragment>
-  )
-}
-
 class Input extends React.Component{
   constructor(props){
     super(props)
@@ -103,7 +97,7 @@ class App extends React.Component{
               <SearchBtn movieSearch={this.movieSearch} />
             </div>
             <div className="search-result-container rounded-circle d-flex justify-content-center align-items-center flex-wrap">
-              <MovieDisplay contents={contents}/>
+              <React.Fragment>{contents}</React.Fragment>
             </div>
           </div>
         </div>
