@@ -1,8 +1,6 @@
 const MovieDisplay = (props) => {
-  const contents = props.movie.map(eachMovie =>
-    <div className="movie-show mx-2" key={eachMovie.id} ><p className="text-wrap">{eachMovie.title}</p><p>{eachMovie.year}</p><img src={eachMovie.img_src}/></div>)
   return (
-    <React.Fragment>{contents}</React.Fragment>
+    <React.Fragment>{props.contents}</React.Fragment>
   )
 }
 
@@ -39,7 +37,7 @@ class App extends React.Component{
     super(props);
     this.state = {
       searchItem: "",
-      movie: [{}]
+      movies: []
     }
     this.searchInput = this.searchInput.bind(this)
     this.movieSearch = this.movieSearch.bind(this)
@@ -53,8 +51,7 @@ class App extends React.Component{
   }
 
   movieSearch (event){
-    // event.preventDefault();
-    const searchItem = this.state.searchItem.toLowerCase()
+    const searchItem = this.state.searchItem.toLowerCase().trim()
     fetch(`https://www.omdbapi.com/?s=${searchItem}&apikey=19cda37e`)
     .then((response) => {
       if(response.ok){
@@ -63,30 +60,39 @@ class App extends React.Component{
        throw new Error('Something is wrong here');
     })
     .then((data) => {
-      const movieArray = data.Search
-      const movie =[]
-      movieArray.forEach((data)=>{
-        const insertObj = {};
-        insertObj.title = data.Title
-        insertObj.year = data.Year
-        insertObj.img_src = data.Poster
-        insertObj.id = data.imdbID
-        console.log(insertObj);
-        movie.push(insertObj)
-      })
+        if (data.Response === 'False') {
+          throw new Error(data.Error);
+        }
+        const movieArray = data.Search
+        const movie =[]
+        movieArray.forEach((data)=>{
+          const insertObj = {};
+          insertObj.title = data.Title
+          insertObj.year = data.Year
+          insertObj.img_src = data.Poster
+          insertObj.id = data.imdbID
+          movie.push(insertObj)
+        })
       this.setState ({
-        movie: movie
+        movies: movie
       })
     })
-
     .catch((error)=>{
-      console.log(error);
+      const message = `there is no match for ${searchItem}`
+      const movie = [{
+        title: message,
+        id: "unknown",
+      }]
+      this.setState({
+        movies: movie
+      })
     })
   }
 
   render(){
-      const movie = this.state.movie.slice()
+      const movies = this.state.movies.slice()
       const searchItem = this.state.searchItem
+      const contents = movies.map(eachMovie => {return (<div className="movie-show mx-2" key={eachMovie.id} ><p className="text-wrap">{eachMovie.title}</p><p>{eachMovie.year}</p><img src={eachMovie.img_src}/></div>)})
     return(
       <div className="container-fuild w-100">
         <div className="row w100">
@@ -97,7 +103,7 @@ class App extends React.Component{
               <SearchBtn movieSearch={this.movieSearch} />
             </div>
             <div className="search-result-container rounded-circle d-flex justify-content-center align-items-center flex-wrap">
-              <MovieDisplay movie={movie} key={movie.id}/>
+              <MovieDisplay contents={contents}/>
             </div>
           </div>
         </div>
@@ -110,33 +116,3 @@ ReactDOM.render(
   <App />,
   document.getElementById("root")
 )
-
-// foreach止める
-// li issues
-
-// Movie finder structure
-// —fetch api
-// —get request
-// —react element
-//
-// Props
-// this.state = {
-//     movie:{
-//     Name: “”,
-//     Year: “”,
-//     Description: ,
-//     Img-src:
-// }
-// }
-//
-// <layout class>
-//     Basic layout : done
-//         Input reflection function :done
-//             Movie fetch function : “GET” request return object
-//                 Movie display function: return <HTML> modifies object returned from fetch
-//     <Search class>
-//     Inherit props.movie
-//         Inherit  Movie fetch function
-//     <display class>
-//         Inherit props.movie
-//         Inherit movie display function:

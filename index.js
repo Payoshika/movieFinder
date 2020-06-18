@@ -7,27 +7,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var MovieDisplay = function MovieDisplay(props) {
-  var contents = props.movie.map(function (eachMovie) {
-    return React.createElement(
-      "div",
-      { className: "movie-show mx-2", key: eachMovie.id },
-      React.createElement(
-        "p",
-        { className: "text-wrap" },
-        eachMovie.title
-      ),
-      React.createElement(
-        "p",
-        null,
-        eachMovie.year
-      ),
-      React.createElement("img", { src: eachMovie.img_src })
-    );
-  });
   return React.createElement(
     React.Fragment,
     null,
-    contents
+    props.contents
   );
 };
 
@@ -92,7 +75,7 @@ var App = function (_React$Component3) {
 
     _this3.state = {
       searchItem: "",
-      movie: [{}]
+      movies: []
     };
     _this3.searchInput = _this3.searchInput.bind(_this3);
     _this3.movieSearch = _this3.movieSearch.bind(_this3);
@@ -112,14 +95,16 @@ var App = function (_React$Component3) {
     value: function movieSearch(event) {
       var _this4 = this;
 
-      // event.preventDefault();
-      var searchItem = this.state.searchItem.toLowerCase();
+      var searchItem = this.state.searchItem.toLowerCase().trim();
       fetch("https://www.omdbapi.com/?s=" + searchItem + "&apikey=19cda37e").then(function (response) {
         if (response.ok) {
           return response.json();
         }
         throw new Error('Something is wrong here');
       }).then(function (data) {
+        if (data.Response === 'False') {
+          throw new Error(data.Error);
+        }
         var movieArray = data.Search;
         var movie = [];
         movieArray.forEach(function (data) {
@@ -128,21 +113,44 @@ var App = function (_React$Component3) {
           insertObj.year = data.Year;
           insertObj.img_src = data.Poster;
           insertObj.id = data.imdbID;
-          console.log(insertObj);
           movie.push(insertObj);
         });
         _this4.setState({
-          movie: movie
+          movies: movie
         });
       }).catch(function (error) {
-        console.log(error);
+        var message = "there is no match for " + searchItem;
+        var movie = [{
+          title: message,
+          id: "unknown"
+        }];
+        _this4.setState({
+          movies: movie
+        });
       });
     }
   }, {
     key: "render",
     value: function render() {
-      var movie = this.state.movie.slice();
+      var movies = this.state.movies.slice();
       var searchItem = this.state.searchItem;
+      var contents = movies.map(function (eachMovie) {
+        return React.createElement(
+          "div",
+          { className: "movie-show mx-2", key: eachMovie.id },
+          React.createElement(
+            "p",
+            { className: "text-wrap" },
+            eachMovie.title
+          ),
+          React.createElement(
+            "p",
+            null,
+            eachMovie.year
+          ),
+          React.createElement("img", { src: eachMovie.img_src })
+        );
+      });
       return React.createElement(
         "div",
         { className: "container-fuild w-100" },
@@ -166,7 +174,7 @@ var App = function (_React$Component3) {
             React.createElement(
               "div",
               { className: "search-result-container rounded-circle d-flex justify-content-center align-items-center flex-wrap" },
-              React.createElement(MovieDisplay, { movie: movie, key: movie.id })
+              React.createElement(MovieDisplay, { contents: contents })
             )
           )
         )
@@ -178,33 +186,3 @@ var App = function (_React$Component3) {
 }(React.Component);
 
 ReactDOM.render(React.createElement(App, null), document.getElementById("root"));
-
-// foreach止める
-// li issues
-
-// Movie finder structure
-// —fetch api
-// —get request
-// —react element
-//
-// Props
-// this.state = {
-//     movie:{
-//     Name: “”,
-//     Year: “”,
-//     Description: ,
-//     Img-src:
-// }
-// }
-//
-// <layout class>
-//     Basic layout : done
-//         Input reflection function :done
-//             Movie fetch function : “GET” request return object
-//                 Movie display function: return <HTML> modifies object returned from fetch
-//     <Search class>
-//     Inherit props.movie
-//         Inherit  Movie fetch function
-//     <display class>
-//         Inherit props.movie
-//         Inherit movie display function:
