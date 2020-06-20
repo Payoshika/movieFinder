@@ -97,7 +97,7 @@ class App extends React.Component{
               <SearchBtn movieSearch={this.movieSearch} />
             </div>
             <div className="search-result-container rounded-circle d-flex justify-content-center align-items-center flex-wrap">
-              <React.Fragment>{contents}</React.Fragment>
+              {contents}
             </div>
           </div>
         </div>
